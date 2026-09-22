@@ -1,0 +1,671 @@
+/* ============================================================
+   RESET Y BASE
+   ============================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* la escena es de pantalla completa, sin scroll */
+  background: #1a1030;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* ============================================================
+   ESCENARIO PRINCIPAL
+   ============================================================ */
+.scene {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------
+   CAPA 1 · CIELO
+   Dos gradientes superpuestos: uno base fijo y uno "glow" que
+   cruza opacidades muy lentamente para simular el paso de luz
+   del atardecer (variaciones sutiles de luminosidad).
+   ------------------------------------------------------------ */
+.sky-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.sky-gradient {
+  position: absolute;
+  inset: 0;
+}
+
+.sky-gradient--base {
+  background: linear-gradient(
+    to bottom,
+    #2b1854 0%,
+    #4a2a72 18%,
+    #7a3b7e 34%,
+    #b8547a 48%,
+    #e07a56 62%,
+    #f2a15c 74%,
+    #f7c873 86%,
+    #f9dd8f 100%
+  );
+}
+
+.sky-gradient--glow {
+  background: linear-gradient(
+    to bottom,
+    #3a1f66 0%,
+    #6b3488 20%,
+    #a5497f 36%,
+    #d9654f 52%,
+    #f0954c 68%,
+    #f6bd5e 82%,
+    #fbe3a1 100%
+  );
+  opacity: 0;
+  animation: skyBreathe 42s ease-in-out infinite;
+}
+
+@keyframes skyBreathe {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.55; }
+}
+
+/* Resplandor cálido alrededor del sol */
+.sun-halo {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: 46vmax;
+  height: 46vmax;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 226, 158, 0.75) 0%,
+    rgba(255, 190, 120, 0.45) 22%,
+    rgba(230, 130, 90, 0.22) 45%,
+    rgba(150, 70, 110, 0.08) 68%,
+    rgba(0, 0, 0, 0) 80%
+  );
+  filter: blur(2px);
+  animation: haloPulse 9s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes haloPulse {
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Aumento de resplandor cuando se activa la sorpresa */
+.scene.is-revealed .sun-halo {
+  animation-name: haloPulseIntense;
+}
+
+@keyframes haloPulseIntense {
+  0%, 100% { opacity: 0.9;  transform: translate(-50%, -50%) scale(1.05); }
+  50%      { opacity: 1;    transform: translate(-50%, -50%) scale(1.15); }
+}
+
+.sun {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: 13vmax;
+  height: 13vmax;
+  min-width: 90px;
+  min-height: 90px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 42% 38%,
+    #fff6d8 0%,
+    #ffe7a3 25%,
+    #ffcf72 48%,
+    #f7a94f 70%,
+    #e8823f 90%,
+    #d96b3b 100%
+  );
+  box-shadow: 0 0 60px 10px rgba(255, 200, 120, 0.55);
+  z-index: 3;
+  animation: sunGlow 9s ease-in-out infinite;
+}
+
+@keyframes sunGlow {
+  0%, 100% { box-shadow: 0 0 60px 10px rgba(255, 200, 120, 0.5); }
+  50%      { box-shadow: 0 0 90px 22px rgba(255, 210, 140, 0.7); }
+}
+
+/* Nubes: formas orgánicas hechas con radial-gradients desenfocados */
+.clouds {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(6px);
+  opacity: 0.55;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 235, 210, 0.85) 0%,
+    rgba(230, 180, 170, 0.45) 55%,
+    rgba(200, 140, 160, 0) 80%
+  );
+  will-change: transform;
+  animation: driftCloud linear infinite;
+}
+
+@keyframes driftCloud {
+  from { transform: translateX(-15vw); }
+  to   { transform: translateX(115vw); }
+}
+
+/* ------------------------------------------------------------
+   CAPA 2 · MONTAÑAS
+   ------------------------------------------------------------ */
+.mountains-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22%;
+  width: 100%;
+  height: 26vh;
+  z-index: 4;
+}
+
+.mountain--back {
+  fill: #3a2350;
+  opacity: 0.85;
+}
+
+.mountain--front {
+  fill: #2a1a3d;
+  opacity: 0.95;
+}
+
+/* ------------------------------------------------------------
+   PANTALLA DE ACCESO (filtro casual con clave)
+   ------------------------------------------------------------ */
+.access-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(120, 70, 90, 0.55) 0%, rgba(30, 15, 40, 0.85) 70%),
+    linear-gradient(to bottom, #2b1854, #1a1030);
+  backdrop-filter: blur(6px);
+  transition: opacity 0.9s ease;
+}
+
+.access-gate.is-unlocked {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.access-gate.shake .access-gate__card {
+  animation: gateShake 0.4s ease;
+}
+
+@keyframes gateShake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+
+.access-gate__card {
+  width: min(340px, 90vw);
+  padding: clamp(24px, 5vw, 36px) clamp(22px, 5vw, 30px);
+  border-radius: 18px;
+  background: rgba(40, 20, 40, 0.55);
+  border: 1px solid rgba(255, 220, 190, 0.25);
+  box-shadow: 0 0 60px 10px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
+.access-gate__label {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 3vw, 1.25rem);
+  color: #fdf1e3;
+  margin-bottom: 1.1em;
+}
+
+#accessGateForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.access-gate__input {
+  width: 100%;
+  padding: 0.65em 0.9em;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 235, 210, 0.4);
+  background: rgba(255, 245, 230, 0.08);
+  color: #fdf1e3;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  text-align: center;
+  outline: none;
+}
+
+.access-gate__input::placeholder {
+  color: rgba(253, 241, 227, 0.55);
+}
+
+.access-gate__input:focus {
+  border-color: rgba(255, 210, 160, 0.8);
+  box-shadow: 0 0 14px rgba(255, 190, 140, 0.35);
+}
+
+.access-gate__submit {
+  padding: 0.6em 1em;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, #f2a927, #d9822a);
+  color: #2b1706;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.access-gate__submit:hover {
+  box-shadow: 0 0 18px rgba(255, 190, 120, 0.5);
+}
+
+.access-gate__submit:active {
+  transform: scale(0.97);
+}
+
+.access-gate__error {
+  margin-top: 0.9em;
+  color: #ffb4b4;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+}
+
+/* ------------------------------------------------------------
+   BASE DEL CAMPO
+   Funde la franja pálida del cielo con el tono cálido y
+   saturado del campo, y añade un reflejo de luz bajo el sol
+   para que la transición horizonte→girasoles no se vea plana.
+   ------------------------------------------------------------ */
+.field-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46%;
+  z-index: 3;
+  background:
+    radial-gradient(
+      ellipse 60% 70% at 50% 0%,
+      rgba(255, 214, 140, 0.55) 0%,
+      rgba(232, 168, 90, 0.28) 35%,
+      rgba(200, 120, 60, 0) 70%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(202, 163, 86, 0) 0%,
+      rgba(202, 163, 86, 0.9) 8%,
+      #c99a4a 16%,
+      #cf9b3e 34%,
+      #d9a238 58%,
+      #e2a92e 80%,
+      #e7ac28 100%
+    );
+}
+
+/* ------------------------------------------------------------
+   CAPAS 3-5 · CAMPO DE GIRASOLES
+   ------------------------------------------------------------ */
+.field-layer {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: visible;
+}
+
+.field-layer--horizon {
+  bottom: 18%;
+  height: 22vh;
+  z-index: 5;
+}
+
+.field-layer--mid {
+  bottom: 8%;
+  height: 32vh;
+  z-index: 6;
+}
+
+.field-layer--front {
+  bottom: -2%;
+  height: 45vh;
+  z-index: 7;
+}
+
+/* Franja de tierra/base del campo para anclar visualmente los girasoles */
+.field-layer--front::before {
+  content: '';
+}
+
+/* Tallo y flor completa: el balanceo se aplica al grupo .plant,
+   con transform-origin en la base para que gire como si el viento
+   lo empujara desde la raíz. */
+.sunflower .plant {
+  transform-origin: 50% 100%;
+  animation: sway var(--sway-duration, 5s) ease-in-out infinite;
+  animation-delay: var(--sway-delay, 0s);
+}
+
+@keyframes sway {
+  0%   { transform: rotate(calc(var(--sway-amt, 2deg) * -1)); }
+  50%  { transform: rotate(var(--sway-amt, 2deg)); }
+  100% { transform: rotate(calc(var(--sway-amt, 2deg) * -1)); }
+}
+
+/* Los pétalos tienen un micro-movimiento independiente y más rápido
+   que el tallo, para que no se vea un balanceo rígido/uniforme. */
+.sunflower .petals {
+  transform-origin: 50% 100%;
+  animation: petalFlutter var(--flutter-duration, 3.2s) ease-in-out infinite;
+  animation-delay: var(--flutter-delay, 0s);
+}
+
+@keyframes petalFlutter {
+  0%, 100% { transform: rotate(-1.4deg) scale(1); }
+  50%      { transform: rotate(1.4deg) scale(1.015); }
+}
+
+.sunflower .stem {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.sunflower .petal {
+  filter: saturate(1.02);
+}
+
+/* ------------------------------------------------------------
+   CAPA 6 · COLIBRÍES
+   ------------------------------------------------------------ */
+.hummingbirds-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.hummingbird {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 22px;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 1.2s ease;
+}
+
+.hummingbird.is-visible {
+  opacity: 1;
+}
+
+.hummingbird svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hummingbird .wing {
+  transform-origin: 50% 50%;
+  animation: wingFlap 0.12s linear infinite;
+}
+
+@keyframes wingFlap {
+  0%, 100% { transform: scaleY(1) rotate(0deg); }
+  50%      { transform: scaleY(0.35) rotate(-8deg); }
+}
+
+/* ------------------------------------------------------------
+   CAPA 7 · PARTÍCULAS
+   ------------------------------------------------------------ */
+.particles-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   MENSAJE ROMÁNTICO
+   ------------------------------------------------------------ */
+.message-overlay {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  width: min(640px, 86vw);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.2s ease, transform 2.2s ease;
+}
+
+.message-overlay.is-visible {
+  opacity: 1;
+  transform: translate(-50%, -52%);
+}
+
+.message-box {
+  padding: clamp(18px, 3vw, 34px) clamp(20px, 4vw, 44px);
+  border-radius: 18px;
+  background: rgba(35, 18, 40, 0.28);
+  backdrop-filter: blur(3px);
+  box-shadow: 0 0 60px 20px rgba(40, 15, 30, 0.25);
+}
+
+.message-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-style: italic;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  color: #fff6e6;
+  text-shadow:
+    0 0 18px rgba(255, 200, 140, 0.65),
+    0 2px 10px rgba(40, 15, 20, 0.6);
+  margin-bottom: 0.7em;
+  letter-spacing: 0.01em;
+}
+
+.message-title .heart {
+  filter: drop-shadow(0 0 10px rgba(255, 130, 130, 0.7));
+}
+
+.message-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: clamp(1.02rem, 2.1vw, 1.35rem);
+  line-height: 1.55;
+  color: #fdf1e3;
+  text-shadow:
+    0 0 14px rgba(60, 20, 30, 0.55),
+    0 1px 4px rgba(30, 10, 15, 0.5);
+}
+
+/* ------------------------------------------------------------
+   BOTÓN SORPRESA
+   ------------------------------------------------------------ */
+.surprise-btn {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(24px, 5vh, 48px);
+  transform: translateX(-50%);
+  z-index: 21;
+  padding: 0.6em 1.4em;
+  border: 1px solid rgba(255, 235, 210, 0.55);
+  border-radius: 999px;
+  background: rgba(40, 20, 35, 0.35);
+  color: #fdf1e3;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 1.8s ease, transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  animation: btnBreathe 3.6s ease-in-out infinite;
+}
+
+.surprise-btn.is-visible {
+  opacity: 1;
+}
+
+.surprise-btn:hover {
+  background: rgba(60, 30, 45, 0.5);
+  box-shadow: 0 0 24px rgba(255, 190, 140, 0.4);
+}
+
+.surprise-btn:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.surprise-btn.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes btnBreathe {
+  0%, 100% { box-shadow: 0 0 0 rgba(255, 190, 140, 0); }
+  50%      { box-shadow: 0 0 18px rgba(255, 190, 140, 0.35); }
+}
+
+/* ------------------------------------------------------------
+   PINTURA DE REFERENCIA (revelado con zoom)
+   Al pulsar el botón sorpresa, esta imagen entra en pantalla
+   completa con un zoom lento desde un plano más cercano hasta
+   su encuadre final, se mantiene unos segundos y se desvanece
+   suavemente para volver a dejar ver la escena interactiva.
+   ------------------------------------------------------------ */
+.reveal-image-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background: #1a1030;
+  transition: opacity 1.6s ease;
+}
+
+.reveal-image-overlay.is-active {
+  opacity: 1;
+}
+
+.reveal-image-overlay.is-fading {
+  opacity: 0;
+}
+
+.reveal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.22);
+  transition: transform 6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.reveal-image-overlay.is-active .reveal-image {
+  transform: scale(1);
+}
+
+/* Reproductor de YouTube completamente oculto visualmente,
+   pero presente en el DOM para que pueda cargar el embed. */
+.yt-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  border: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .sun {
+    width: 22vmax;
+    height: 22vmax;
+  }
+
+  .sun-halo {
+    width: 70vmax;
+    height: 70vmax;
+  }
+
+  .message-overlay {
+    top: 38%;
+    width: 92vw;
+  }
+
+  .message-box {
+    padding: 16px 18px;
+    border-radius: 14px;
+  }
+
+  .message-body {
+    line-height: 1.5;
+  }
+
+  .hummingbird {
+    width: 24px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-overlay {
+    top: 36%;
+  }
+
+  .message-title {
+    margin-bottom: 0.5em;
+  }
+
+  .surprise-btn {
+    bottom: 20px;
+    padding: 0.55em 1.1em;
+  }
+}
+
+/* Respeta la preferencia del usuario de reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .sky-gradient--glow,
+  .sun-halo,
+  .sun,
+  .cloud,
+  .sunflower .plant,
+  .sunflower .petals,
+  .surprise-btn {
+    animation: none !important;
+  }
+}

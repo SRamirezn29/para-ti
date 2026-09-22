@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Para el amor de mi vida</title>
+
+<!-- Tipografías románticas: una serif elegante para el título, una script para el cuerpo -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ======================================================
+       ESCENARIO PRINCIPAL
+       Cada capa está apilada con position:absolute dentro de
+       #scene y se anima de forma independiente para lograr
+       una sensación de profundidad tipo pintura viva.
+  ======================================================= -->
+  <div class="scene" id="scene">
+
+    <!-- Pantalla de acceso: barrera simple con clave para que solo quien
+         reciba el enlace pueda entrar. No es seguridad real (es JS del
+         lado del cliente), solo un filtro casual para un enlace personal. -->
+    <div class="access-gate" id="accessGate">
+      <div class="access-gate__card">
+        <p class="access-gate__label">Este momento es solo para ti</p>
+        <form id="accessGateForm" autocomplete="off">
+          <input type="password" id="accessGateInput" class="access-gate__input"
+                 placeholder="Clave secreta" autocomplete="off" aria-label="Clave secreta">
+          <button type="submit" class="access-gate__submit">Entrar ❤️</button>
+        </form>
+        <p class="access-gate__error" id="accessGateError" hidden>Esa no es la clave. Intenta de nuevo.</p>
+      </div>
+    </div>
+
+    <!-- CAPA 1: Cielo, resplandor del sol y nubes -->
+    <div class="sky-layer">
+      <div class="sky-gradient sky-gradient--base"></div>
+      <div class="sky-gradient sky-gradient--glow" id="skyGlowOverlay"></div>
+
+      <div class="sun-halo" id="sunHalo"></div>
+      <div class="sun" id="sun"></div>
+
+      <div class="clouds" id="cloudsLayer">
+        <!-- Las nubes se generan por JS (cloud.js logic dentro de script.js) -->
+      </div>
+    </div>
+
+    <!-- CAPA 2: Cadena de montañas lejanas -->
+    <svg class="mountains-layer" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
+      <path class="mountain mountain--back"
+            d="M0,220 L0,140 Q80,90 160,120 Q260,60 340,110 Q430,70 520,115 Q610,80 700,125 Q800,85 880,130 Q950,105 1000,135 L1000,220 Z"></path>
+      <path class="mountain mountain--front"
+            d="M0,220 L0,170 Q100,130 190,160 Q300,110 400,155 Q500,120 600,160 Q700,130 800,165 Q900,140 1000,168 L1000,220 Z"></path>
+    </svg>
+
+    <!-- Base del campo: funde el horizonte pálido con el tono cálido y saturado
+         del campo de girasoles, y añade un reflejo de luz bajo el sol -->
+    <div class="field-ground" aria-hidden="true"></div>
+
+    <!-- CAPA 3, 4 y 5: Campo de girasoles (horizonte, medio y primer plano). Contenido inyectado por script.js -->
+    <svg class="field-layer field-layer--horizon" id="fieldHorizon" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <svg class="field-layer field-layer--mid" id="fieldMid" viewBox="0 0 1000 320" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <svg class="field-layer field-layer--front" id="fieldFront" viewBox="0 0 1000 380" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+    <!-- CAPA 6: Colibríes (divs posicionados y animados por JS con requestAnimationFrame) -->
+    <div class="hummingbirds-layer" id="hummingbirdsLayer" aria-hidden="true"></div>
+
+    <!-- CAPA 7: Partículas de luz / polen (canvas ligero) -->
+    <canvas class="particles-layer" id="particlesCanvas" aria-hidden="true"></canvas>
+
+    <!-- Mensaje romántico central -->
+    <div class="message-overlay" id="messageOverlay">
+      <div class="message-box">
+        <h1 class="message-title">Para el amor de mi vida <span class="heart">❤️</span></h1>
+        <p class="message-body">
+          Entre tantos caminos que existen en este mundo,<br>
+          qué bonito fue coincidir contigo.<br>
+          Así como los girasoles buscan la luz,<br>
+          yo encuentro en ti una razón para sonreír,<br>
+          para seguir adelante y para disfrutar cada instante.
+          <br><br>
+          Gracias por formar parte de mi vida.<br>
+          Espero que cada atardecer nos recuerde<br>
+          lo hermoso que es compartir el camino contigo.
+        </p>
+      </div>
+    </div>
+
+    <!-- Botón discreto que revela la sorpresa completa -->
+    <button class="surprise-btn" id="surpriseBtn" type="button">Una sorpresa para ti ❤️</button>
+
+    <!-- Pintura de referencia: aparece con un efecto de zoom al pulsar el botón -->
+    <div class="reveal-image-overlay" id="revealImageOverlay" aria-hidden="true">
+      <img class="reveal-image" src="sunset-sunflowers.webp" alt="Campo de girasoles al atardecer">
+    </div>
+
+    <!-- Iframe oculto para el reproductor de YouTube (embed oficial, sin API externa) -->
+    <iframe id="youtubePlayer" class="yt-hidden" title="Música" src=""
+            allow="autoplay; encrypted-media" aria-hidden="true"></iframe>
+
+    <!-- Fallback preparado para una fuente de audio autorizada, si en el futuro se añade un archivo propio -->
+    <audio id="bgAudioFallback" preload="none" loop hidden></audio>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
