@@ -596,12 +596,18 @@ html, body {
   transform: scale(1);
 }
 
-/* Reproductor de YouTube completamente oculto visualmente,
-   pero presente en el DOM para que pueda cargar el embed. */
+/* Reproductor de YouTube oculto visualmente pero con un tamaño
+   "real" (no 1x1px): varios navegadores limitan/pausan el
+   procesamiento de iframes casi invisibles para ahorrar batería,
+   lo que causaba que el audio se entrecortara. Al posicionarlo
+   fuera de la pantalla en vez de encogerlo, deja de activar esa
+   optimización y la reproducción es estable. */
 .yt-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  top: 0;
+  left: -9999px;
+  width: 320px;
+  height: 180px;
   overflow: hidden;
   opacity: 0;
   border: 0;
